@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
-import apiClient from '@/lib/api'
 import { AuthUser } from '@/lib/types'
 
 interface AppShellProps {
@@ -13,8 +12,10 @@ interface AppShellProps {
 }
 
 const fetcher = async (url: string): Promise<AuthUser> => {
-  const res = await apiClient.get(url)
-  return res.data
+  // Call frontend API route which has access to httpOnly cookie
+  const res = await fetch(url)
+  if (!res.ok) throw new Error('Unauthorized')
+  return res.json()
 }
 
 export default function AppShell({ children, pageTitle }: AppShellProps) {
